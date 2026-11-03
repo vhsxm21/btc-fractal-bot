@@ -1,0 +1,30 @@
+name: Hourly BTC Fractal Bot
+
+on:
+  schedule:
+    # 매시간 1분마다 실행 (UTC 기준 정각 캔들 확정 후 1분 뒤 자동 실행)
+    - cron: '1 * * * *'
+  workflow_dispatch: # Actions 탭에서 수동으로 'Run workflow' 버튼을 누를 수 있게 해주는 옵션
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install yfinance pandas requests numpy
+
+      - name: Run trading alert bot
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python bot.py
